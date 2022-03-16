@@ -1,0 +1,78 @@
+  // Step 1: Load files
+  
+  path = File.openDialog("Select a File");
+  //open(path); // open the file
+  dir = File.getParent(path); //path to the file
+  name = File.getName(path); // Name of the file
+  var array_list = getFileList(dir);
+  
+
+for (i=0; i<array_list.length; i++){
+	if(endsWith(array_list[i], ".JPG")){
+		open(dir + "/" + array_list[i]);}
+}
+
+// Everything above may open multiple images
+
+
+// Step 2: Subtract images
+// Subtract images from the reference image.
+
+var reference_image = split(name, '.');  // Split the name to "name" + "extension"
+
+
+File.makeDirectory(dir + "/results");
+
+for(i=0;i<array_list.length;i++){
+	if(endsWith(array_list[i], ".JPG")){
+	var sub_image = split(array_list[i],".");
+	imageCalculator("difference create",array_list[i], name);
+	saveAs("jpeg", dir + "/results/" + reference_image[0]+ "_and_" +  sub_image[0]);
+	if(array_list[i] != name){
+		close(array_list[i]);
+		}
+	
+	}}
+close(name);
+
+
+// Step 3: Analyze
+
+x = 1500;
+y = 1400;
+width = getWidth() - x - 1700;
+height = getHeight() - y - 1000;
+
+for(i=0;i<array_list.length;i++){
+	if(endsWith(array_list[i], ".JPG")){
+	var sub_image = split(array_list[i],".");
+	window_name = "Result of " + array_list[i];
+	selectWindow(window_name);
+	run("Clear Results");
+	makeRectangle(x,y,width,height);
+    	profile = getProfile();
+	collectedValues = "";
+	
+     	for (j=0; j<profile.length; j++) {
+           		collectedValues=collectedValues+j + ","+profile[j] + "\n"; 
+     	} 
+     	collectedValues=collectedValues+"\n"; 
+	selectWindow(window_name);
+	makeRectangle(x,y,width,height);
+	run("Plot Profile");
+	run("Copy");
+	saveAs("jpeg", dir + "/results/" + reference_image[0]+ "_and_" +  sub_image[0] + "_ProfilePlot");
+	
+    	f = File.open(dir + "/results/" + reference_image[0]+ "_and_" +  sub_image[0] + "_Data.csv");
+   	 print(f, collectedValues);
+	File.close(f);
+	
+	close(window_name);
+	close("Plot of Result of " + sub_image[0]);
+		
+}}
+
+
+
+
+
